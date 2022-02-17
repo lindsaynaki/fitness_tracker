@@ -1,10 +1,10 @@
-const { client } = require('./index')
+const { client } = require('./client')
 
 const getActivityById = async (id) => {
     try {
         const {rows: [activity]} = await client.query(`
-            SELECT * FROM activites
-            WHERE id = $1
+            SELECT * FROM activities
+            WHERE id=$1
         `, [id])
         return activity; 
     } catch(error) {
@@ -26,8 +26,8 @@ const getAllActivities = async () => {
 const createActivity = async ({name, description}) => {
     try {
         const {rows: [activity]} = await client.query(`
-            INSERT INTO activites (name, description)
-            VALUES $1, $2
+            INSERT INTO activities (name, description)
+            VALUES ($1, $2)
             RETURNING *;
         `, [name, description])
         return activity;
@@ -36,13 +36,15 @@ const createActivity = async ({name, description}) => {
     }
 };
 
+// not sure if this is correct
 const updateActivity = async (id, name, description) => {
     try {   
         const {rows: [activity]} = await client.query(`
             UPDATE activities
-            SET name=${name}, description=${description}
-            WHERE id=$1
-        `, [id])
+            SET name = $1, description = $2
+            WHERE id = $3
+            RETURNING *
+        `, [name, description, id])
         return activity
     } catch(error) {
         throw error
