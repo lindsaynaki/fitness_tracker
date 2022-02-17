@@ -27,7 +27,33 @@ const getUser = async ({ username }) => {
     }
 }
 
+const getUserById = async (userId) => {
+    try {
+        const { rows: [user] } = await client.query(`
+            SELECT * FROM users
+            WHERE id=$1;
+        `, [userId])
+        return user;
+    } catch(error) {
+        throw error; 
+    }
+}
+
+const getUserByUsername = async (username) => {
+    try {
+        const { rows: [user] } = await client.query(`
+            SELECT * FROM users
+            WHERE username=$1;
+        `, [username]);
+        return user;
+    } catch(error) {
+        throw error; 
+    }
+}
+
 module.exports = {
     createUser,
-    getUser
+    getUser,
+    getUserById,
+    getUserByUsername
 }
