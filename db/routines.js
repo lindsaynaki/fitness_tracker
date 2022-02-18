@@ -1,4 +1,4 @@
-const { client } = require('./client')
+const client  = require('./client')
 
 const getRoutineById = async (id) => {
     try {
@@ -99,7 +99,7 @@ const updateRoutine = async ({ id, isPublic, name, goal}) => {
     try {
         const { rows: [routine] } = await client.query(`
             UPDATE routines 
-            SET "isPublic" = $1, name = $2, goald = $3
+            SET "isPublic" = $1, name = $2, goal = $3
             WHERE id=$4
             RETURNING *;
         `, [isPublic, name, goal, id])
