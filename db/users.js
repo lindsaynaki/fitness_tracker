@@ -10,6 +10,7 @@ const createUser = async ({username, password}) => {
             VALUES ($1, $2)
             RETURNING *; 
         `, [username, hashPwd]);
+        delete user.password;
         return user;
     } catch(error) {
         throw error; 
