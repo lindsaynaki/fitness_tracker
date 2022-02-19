@@ -139,7 +139,8 @@ const createRoutine = async({ creatorId, isPublic, name, goal}) => {
     }
 }
 
-const updateRoutine = async ({ id, isPublic, name, goal}) => {
+const updateRoutine = async ({ id, ...routineFields}) => {
+
     try {
         const { rows: [routine] } = await client.query(`
             UPDATE routines 
