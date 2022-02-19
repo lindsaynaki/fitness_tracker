@@ -1,4 +1,4 @@
-const client  = require('./client')
+const client = require('./client')
 
 const getRoutineById = async (id) => {
     try {
@@ -12,18 +12,17 @@ const getRoutineById = async (id) => {
     }
 };
 
-// what does it mean without activities
 const getRoutinesWithoutActivities = async () => {
     try {
         const {rows: routines } = await client.query(`
             SELECT * FROM routines
+            WHERE id NOT IN (SELECT "routineId" FROM routine_activities)
         `)
         return routines;
     } catch(error) {
         throw error
     }
 };
-
 
 // supposed to include activities 
 const getAllRoutines = async () => {
