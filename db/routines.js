@@ -1,4 +1,5 @@
-const client  = require('./client')
+const client = require('./client')
+const util = require('util')
 
 const getRoutineById = async (id) => {
     try {
@@ -12,11 +13,11 @@ const getRoutineById = async (id) => {
     }
 };
 
-// what does it mean without activities
 const getRoutinesWithoutActivities = async () => {
     try {
         const {rows: routines } = await client.query(`
             SELECT * FROM routines
+            WHERE id NOT IN (SELECT "routineId" FROM routine_activities)
         `)
         return routines;
     } catch(error) {
@@ -24,13 +25,27 @@ const getRoutinesWithoutActivities = async () => {
     }
 };
 
-
 // supposed to include activities 
+// selects and returns an array of all routines, includes their activities 
+// includes username, from users join, aliased as creatorName 
+// includes duration and count on activities, from routine_activities join
 const getAllRoutines = async () => {
     try {
         const {rows: routines} = await client.query(`
-            SELECT * FROM routines
+            SELECT routines.*, users.username AS "creatorName" FROM routines 
+            JOIN users ON users.id=routines."creatorId"
         `)
+        const { rows: activities } = await client.query(`
+            SELECT activities.*, routine_activities."routineId", routine_activities.duration, routine_activities.count FROM activities
+            JOIN routine_activities ON activities.id = routine_activities."activityId";
+        `)
+
+        routines.forEach((routine) => {
+            routine.activities = activities.filter(activity => 
+                routine.id === activity.routineId);
+        })
+        
+        console.log('routines: ', util.inspect(routines, false, 5, true))
         return routines;
     } catch(error) {
         throw error
@@ -39,11 +54,21 @@ const getAllRoutines = async () => {
 
 const getAllPublicRoutines = async () => { 
     try {
-        const { rows: publicRoutines } = await client.query(`
-            SELECT * FROM routines
-            WHERE "isPublic" = true;
+        const { rows: routines } = await client.query(`
+            SELECT routines.*, users.username AS "creatorName" FROM routines 
+            JOIN users ON users.id=routines."creatorId"
+            WHERE "isPublic" = true
         `)
-        return publicRoutines; 
+        const { rows: activities } = await client.query(`
+            SELECT * FROM activities
+            JOIN routine_activities ON activities.id = routine_activities."activityId"
+        `)
+        routines.forEach((routine) => {
+            routine.activities = activities.filter(activity => 
+                routine.id === activity.routineId);
+        })
+        console.log('public routines: ', routines)
+        return routines; 
     } catch(error) {
         throw error
     }
@@ -52,25 +77,44 @@ const getAllPublicRoutines = async () => {
 const getAllRoutinesByUser = async ({username}) => {
     try {   
         const { rows: routines } = await client.query(`
-            SELECT * FROM routines
-            WHERE username=$1;
+            SELECT routines.*, users.username AS "creatorName" FROM routines 
+            JOIN users ON users.id=routines."creatorId"
+            WHERE users.username = $1;
         `, [username])
-        return routines;
+        const { rows: activities } = await client.query(`
+            SELECT * FROM activities
+            JOIN routine_activities ON activities.id = routine_activities."activityId"
+        `)
+        routines.forEach((routine) => {
+            routine.activities = activities.filter(activity => 
+                routine.id === activity.routineId);
+        })
+
+        return routines; 
     } catch(error) {
         throw error
     }
 }
 
-// not sure if this is correct 
 const getPublicRoutinesByUser = async ({username}) => {
-    try{
-        const { rows: publicRoutines } = await client.query(`
-            SELECT * FROM routines
-            WHERE username = $1, "isPublic" = $2
-        `, [username, isPublic])
-     } catch(error) {
-        throw error
-    }
+    try {
+        const { rows: routines } = await client.query(`
+            SELECT routines.*, users.username AS "creatorName" FROM routines 
+            JOIN users ON users.id=routines."creatorId"
+            WHERE "isPublic" = true AND users.username = $1;
+        `, [username])
+        const { rows: activities } = await client.query(`
+            SELECT * FROM activities
+            JOIN routine_activities ON activities.id = routine_activities."activityId"
+        `)
+        routines.forEach((routine) => {
+        routine.activities = activities.filter(activity => 
+            routine.id === activity.routineId);
+    })
+        return routines;
+    } catch(error) {
+        throw error;
+    } 
 }
 
 // what you mean by activity
@@ -111,12 +155,18 @@ const updateRoutine = async ({ id, isPublic, name, goal}) => {
 
 // make sure to delete all the routine_activities whose routine is the one being deleted
 const destroyRoutine = async (id) => {
-    try { 
+    try {        
         await client.query(`
-            UPDATE routines
-            SET "isPublic" = false
+            DELETE FROM routine_activities
+            WHERE "routineId"=$1
+        `, [id]) 
+        
+        await client.query(`
+            DELETE FROM routines
             WHERE id = $1;
-        `, [id])
+        `, [id]);
+
+
     } catch(error) {
         throw error
     }
