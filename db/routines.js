@@ -54,11 +54,21 @@ const getAllRoutines = async () => {
 
 const getAllPublicRoutines = async () => { 
     try {
-        const { rows: publicRoutines } = await client.query(`
-            SELECT * FROM routines
-            WHERE "isPublic" = true;
+        const { rows: routines } = await client.query(`
+            SELECT routines.*, users.username AS "creatorName" FROM routines 
+            JOIN users ON users.id=routines."creatorId"
+            WHERE "isPublic" = true
         `)
-        return publicRoutines; 
+        const { rows: activities } = await client.query(`
+            SELECT * FROM activities
+            JOIN routine_activities ON activities.id = routine_activities."activityId"
+        `)
+        routines.forEach((routine) => {
+            routine.activities = activities.filter(activity => 
+                routine.id === activity.routineId);
+        })
+        console.log('public routines: ', routines)
+        return routines; 
     } catch(error) {
         throw error
     }
