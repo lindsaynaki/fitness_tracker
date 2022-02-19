@@ -155,12 +155,18 @@ const updateRoutine = async ({ id, isPublic, name, goal}) => {
 
 // make sure to delete all the routine_activities whose routine is the one being deleted
 const destroyRoutine = async (id) => {
-    try { 
+    try {        
         await client.query(`
-            UPDATE routines
-            SET "isPublic" = false
+            DELETE FROM routine_activities
+            WHERE "routineId"=$1
+        `, [id]) 
+        
+        await client.query(`
+            DELETE FROM routines
             WHERE id = $1;
-        `, [id])
+        `, [id]);
+
+
     } catch(error) {
         throw error
     }
