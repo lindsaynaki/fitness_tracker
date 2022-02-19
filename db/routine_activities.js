@@ -65,7 +65,8 @@ const getRoutineActivitiesByRoutine = async ({id}) => {
         const { rows: routine_activity } = await client.query(`
         SELECT *
         FROM routine_activities
-        `, [id])
+        WHERE "routineId" = ${id}
+        `)
         return routine_activity
 
     } catch(error) {
