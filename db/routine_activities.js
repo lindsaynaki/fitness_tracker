@@ -7,8 +7,7 @@ const getRoutineActivityById = async (id) => {
         FROM routine_activities
         WHERE id=$1
         `, [id])
-        return routine_activity
-        
+        return routine_activity 
     } catch(error) {
         throw error; 
     }
@@ -34,30 +33,31 @@ const updateRoutineActivity = async ({id, ...routineFields}) => {
     if (setString.length === 0) {
         return;
     }
-try {
-    const { rows: [routine_activities] } = await client.query(`
-    UPDATE routine_activities
-    SET ${setString}
-    WHERE id=${id}
-    RETURNING *;
-    `, Object.values(routineFields));
-
-    return routine_activities
-
-} catch(error) {
-    throw error
-}
+        try {
+            const { rows: [routine_activities] } = await client.query(`
+                UPDATE routine_activities
+                SET ${setString}
+                WHERE id=${id}
+                RETURNING *;
+                `, Object.values(routineFields));
+            return routine_activities
+        } catch(error) {
+            throw error
+        }
 }
 
-const destroyRoutineActivity = async ({id}) => {
-try {
-    await client.query(`
-    DELETE FROM routine_activities
-    WHERE id=$1;
-    `, [ id ])
-} catch(error) {
-    throw error
-}
+const destroyRoutineActivity = async (id) => {
+    try {
+        const {rows: [routine_activity] } = await client.query( `
+                DELETE FROM routine_activities
+                WHERE id = $1
+                RETURNING *;
+            `, [id]
+        )
+        return routine_activity;
+    } catch(error) {
+        throw error
+    }
 }
 
 const getRoutineActivitiesByRoutine = async ({id}) => {
@@ -65,8 +65,8 @@ const getRoutineActivitiesByRoutine = async ({id}) => {
         const { rows: routine_activity } = await client.query(`
         SELECT *
         FROM routine_activities
-        WHERE "routineId" = ${id}
-        `)
+        WHERE "routineId" = $1
+        `, [id])
         return routine_activity
 
     } catch(error) {
