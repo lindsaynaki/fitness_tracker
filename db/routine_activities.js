@@ -49,7 +49,7 @@ try {
 }
 }
 
-const destroyRoutineActivity = async (id) => {
+const destroyRoutineActivity = async ({id}) => {
 try {
     await client.query(`
     DELETE FROM routine_activities
@@ -62,7 +62,7 @@ try {
 
 const getRoutineActivitiesByRoutine = async ({id}) => {
     try {
-        const { rows: [id] } = await client.query(`
+        const { rows } = await client.query(`
         SELECT *
         FROM routine_activities
         
