@@ -117,13 +117,28 @@ const getPublicRoutinesByUser = async ({username}) => {
     } 
 }
 
-// what you mean by activity
-const getPublicRoutinesbyActivity = async ({id}) => {
+const getPublicRoutinesByActivity = async ({id}) => {
     try {
-
-    } catch(error){
-        throw error
-    }
+        const { rows: routines } = await client.query(`
+            SELECT routines.*, users.username AS "creatorName" FROM routines 
+            JOIN users ON users.id=routines."creatorId"
+            WHERE "isPublic" = true;
+        `)
+        const { rows: activities } = await client.query(`
+            SELECT * FROM routine_activities
+            WHERE "activityId" IN (SELECT id FROM activities WHERE id = $1);
+        `, [id]
+        )
+        
+        routines.forEach((routine) => {
+            routine.activities = activities.filter(activity => 
+                routine.id === activity.routineId);
+    })
+        console.log('routines by activity: ',  util.inspect(routines, false, 5, true))
+        return routines;
+    } catch(error) {
+        throw error;
+    } 
 }
 
 const createRoutine = async({ creatorId, isPublic, name, goal}) => {
@@ -185,7 +200,7 @@ module.exports = {
     getAllRoutines,
     getAllRoutinesByUser, 
     getPublicRoutinesByUser,
-    getPublicRoutinesbyActivity,
+    getPublicRoutinesByActivity,
     createRoutine,
     updateRoutine,
     destroyRoutine
