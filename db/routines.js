@@ -77,10 +77,20 @@ const getAllPublicRoutines = async () => {
 const getAllRoutinesByUser = async ({username}) => {
     try {   
         const { rows: routines } = await client.query(`
-            SELECT * FROM routines
-            WHERE username=$1;
+            SELECT routines.*, users.username AS "creatorName" FROM routines 
+            JOIN users ON users.id=routines."creatorId"
+            WHERE users.username = $1;
         `, [username])
-        return routines;
+        const { rows: activities } = await client.query(`
+            SELECT * FROM activities
+            JOIN routine_activities ON activities.id = routine_activities."activityId"
+        `)
+        routines.forEach((routine) => {
+            routine.activities = activities.filter(activity => 
+                routine.id === activity.routineId);
+        })
+
+        return routines; 
     } catch(error) {
         throw error
     }
