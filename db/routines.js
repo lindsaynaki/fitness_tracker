@@ -139,14 +139,20 @@ const createRoutine = async({ creatorId, isPublic, name, goal}) => {
     }
 }
 
-const updateRoutine = async ({ id, isPublic, name, goal}) => {
+const updateRoutine = async ({ id, ...routineFields}) => {
+    const setString = Object.keys(routineFields).map((key, index) => 
+        `"${key}" = $${index + 1}`).join(', ')
+    
+    if (setString.length === 0) {
+        return; 
+    }
     try {
         const { rows: [routine] } = await client.query(`
             UPDATE routines 
-            SET "isPublic" = $1, name = $2, goal = $3
-            WHERE id=$4
+            SET ${setString}
+            WHERE id=${id}
             RETURNING *;
-        `, [isPublic, name, goal, id])
+        `, Object.values(routineFields))
         return routine; 
     } catch(error) {
         throw error

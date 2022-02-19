@@ -27,20 +27,20 @@ const addActivityToRoutine = async ({routineId, activityId, count, duration}) =>
     }
 };
 
-const updateRoutineActivity = async (id, fields = {}) => {
-    const setString = Object.keys(fields).map(
+const updateRoutineActivity = async ({id, ...routineFields}) => {
+    const setString = Object.keys(routineFields).map(
         (key, index) => `"${ key }"=$${ index + 1 }`
     ).join(', ');
     if (setString.length === 0) {
         return;
     }
 try {
-    const { rows: routine_activities } = await client.query(`
+    const { rows: [routine_activities] } = await client.query(`
     UPDATE routine_activities
     SET ${setString}
     WHERE id=${id}
     RETURNING *;
-    `, Object.values(fields));
+    `, Object.values(routineFields));
 
     return routine_activities
 
