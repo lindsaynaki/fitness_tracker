@@ -25,11 +25,28 @@ const getRoutinesWithoutActivities = async () => {
 };
 
 // supposed to include activities 
+// selects and returns an array of all routines, includes their activities 
+// includes username, from users join, aliased as creatorName 
+// includes duration and count on activities, from routine_activities join
 const getAllRoutines = async () => {
     try {
         const {rows: routines} = await client.query(`
-            SELECT * FROM routines
+            SELECT * FROM routines;
         `)
+        const { rows: activities } = await client.query(`
+            SELECT * FROM activities
+            JOIN routine_activities ON activities.id = routine_activities."activityId";
+        `)
+        const { rows: creatorName } = await client.query(`
+            SELECT users.id, users.username FROM users
+            JOIN routines ON users.id=routines."creatorId"
+        `)
+
+        routines.forEach((routine) => {
+            routine.activities = activities.filter(activity => routine.id === activity.routineId);
+        })
+
+        console.log('routines: ', routines)
         return routines;
     } catch(error) {
         throw error
