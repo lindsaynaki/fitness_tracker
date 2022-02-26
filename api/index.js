@@ -45,14 +45,14 @@ apiRouter.use(async (req, res, next) => {
 const usersRouter = require('./users');
 apiRouter.use('/users', usersRouter);
 
-const activitiesRouter = require('./activities');
-apiRouter.use('/activities', activitiesRouter);
+// const activitiesRouter = require('./activities');
+// apiRouter.use('/activities', activitiesRouter);
 
-const routinesRouter = require('./routines');
-apiRouter.use('/routines', routinesRouter);
+// const routinesRouter = require('./routines');
+// apiRouter.use('/routines', routinesRouter);
 
-const routineActivitiesRouter = require('./routine_activities');
-apiRouter.use('/routine_activities', routineActivitiesRouter);
+// const routineActivitiesRouter = require('./routine_activities');
+// apiRouter.use('/routine_activities', routineActivitiesRouter);
 
 
 module.exports = apiRouter;
