@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = process.env;
 const bcrypt = require('bcrypt');
 const { getUserByUsername, createUser } = require('../db/users');
+const { getPublicRoutinesByUser } = require('../db/routines');
 const { requireUser } = require('./util');
 
 usersRouter.post('/register', async (req, res, next) => {
@@ -83,6 +84,17 @@ usersRouter.get('/me', requireUser, async (req, res, next) => {
     }catch(error){
     next(error)
 }
+})
+
+usersRouter.get('/:username/routines', async (req, res, next) => {
+    const { username } = req.params
+    try{
+        const routines = await getPublicRoutinesByUser({username})
+        res.send(routines);
+    
+    }catch (error){
+    next(error)
+    }
 })
 
 module.exports = usersRouter;
