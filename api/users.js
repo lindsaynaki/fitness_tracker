@@ -48,23 +48,32 @@ usersRouter.post('/register', async (req, res, next) => {
 
 });
 
-// usersRouter.post('/login', async (req, res, next) => {
-//     const {usernam, password} = req.body;
+usersRouter.post('/login', async (req, res, next) => {
+    const {username, password} = req.body;
 
-//     if(!username || !password) {
-//         next({
-//             name: "MissingCredentialsError",
-//             message: "Please enter both username and password"
-//         });
-//     }
+    if(!username || !password) {
+        next({
+            name: "MissingCredentialsError",
+            message: "Please enter both username and password"
+        });
+    }
 
-//     try {
-//         const user = await getUserByUsername(username);
+    try {
+        const user = await getUserByUsername(username);
+        const isMatch = await bcrypt.compare(password, user.password)
 
-//         if(user && user.password === password){
-
-//         }
-//     }
-// })
+        if(user && isMatch){
+            const token = jwt.sign(user, JWT_SECRET);
+            res.send({ token, message: "Thank you for logging in" })
+        }else{
+            next({
+                name: "IncorrectCredentialsError",
+                message: "Username or Password incorrect"
+            })
+        }
+    } catch (error){
+        next(error);
+    }
+})
 
 module.exports = usersRouter;
