@@ -1,6 +1,7 @@
 const express = require ('express');
 const activitiesRouter = express.Router();
-const { getAllActivities, createActivity, updateActivity } = require('../db/activities');
+const { getAllActivities, createActivity, updateActivity, getActivityById } = require('../db/activities');
+const { getPublicRoutinesByActivity } = require('../db/routines')
 const { requireUser } = require('./util');
 
 activitiesRouter.get('/', async (req, res, next) => {
@@ -49,6 +50,17 @@ activitiesRouter.patch('/:activityId', requireUser, async (req, res, next) => {
     } catch(error){
     next(error)
     }
-})
+});
+
+activitiesRouter.get('/:activityId/routines', async (req, res, next) => {
+    const { activityId } = req.params;
+    try {
+        const routines = await getPublicRoutinesByActivity(activityId);
+        res.send(routines);
+    }catch(error){
+    next(error)
+    }
+
+});
 
 module.exports = activitiesRouter;
