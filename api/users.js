@@ -1,10 +1,10 @@
 const express = require('express');
-const usersRouter = express.Router()
+const usersRouter = express.Router();
+const { getUserByUsername, createUser, getPublicRoutinesByUser } = require('../db');
+const { requireUser } = require('./util');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = process.env;
 const bcrypt = require('bcrypt');
-const { getUserByUsername, createUser, getPublicRoutinesByUser } = require('../db');
-const { requireUser } = require('./util');
 
 // POST /users/register
 usersRouter.post('/register', async (req, res, next) => {
