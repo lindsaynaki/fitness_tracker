@@ -30,14 +30,14 @@ const getUser = async ({ username, password }) => {
                 name: "UserNotFound",
                 message: "User not found with that username"
             }
-        }
+        };
 
-        const isMatch = await bcrypt.compare(password, user.password)
+        const isMatch = await bcrypt.compare(password, user.password);
 
         if (isMatch) {
             delete user.password;
             return user;
-        }
+        };
 
     } catch (error) {
         throw error;
@@ -55,7 +55,7 @@ const getUserById = async (userId) => {
     } catch (error) {
         throw error;
     }
-}
+};
 
 const getUserByUsername = async (username) => {
     try {
@@ -63,11 +63,12 @@ const getUserByUsername = async (username) => {
             SELECT * FROM users
             WHERE username=$1;
         `, [username]);
+
         return user;
     } catch (error) {
         throw error;
     }
-}
+};
 
 module.exports = {
     createUser,

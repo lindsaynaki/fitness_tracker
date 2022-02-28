@@ -42,13 +42,13 @@ const addActivitiesToRoutines = async (routines) => {
             routine.activities = activities.filter((activity) => {
                 return activity.routineId === routine.id
             })
-        })
+        });
 
         return routines;
     } catch (error) {
         throw error;
     }
-}
+};
 
 const getAllRoutines = async () => {
     try {
@@ -59,9 +59,9 @@ const getAllRoutines = async () => {
 
         return await addActivitiesToRoutines(routines);
     } catch (error) {
-        throw error
+        throw error;
     }
-}
+};
 
 const getAllPublicRoutines = async () => {
     try {
@@ -73,9 +73,9 @@ const getAllPublicRoutines = async () => {
 
         return await addActivitiesToRoutines(routines);
     } catch (error) {
-        throw error
+        throw error;
     }
-}
+};
 
 const getAllRoutinesByUser = async ({ username }) => {
     try {
@@ -87,9 +87,9 @@ const getAllRoutinesByUser = async ({ username }) => {
 
         return await addActivitiesToRoutines(routines);
     } catch (error) {
-        throw error
+        throw error;
     }
-}
+};
 
 const getPublicRoutinesByUser = async ({ username }) => {
     try {
@@ -103,7 +103,7 @@ const getPublicRoutinesByUser = async ({ username }) => {
     } catch (error) {
         throw error;
     }
-}
+};
 
 const getPublicRoutinesByActivity = async ({ id }) => {
     try {
@@ -117,7 +117,7 @@ const getPublicRoutinesByActivity = async ({ id }) => {
     } catch (error) {
         throw error;
     }
-}
+};
 
 const createRoutine = async ({ creatorId, isPublic, name, goal }) => {
     try {
@@ -129,9 +129,9 @@ const createRoutine = async ({ creatorId, isPublic, name, goal }) => {
 
         return routine;
     } catch (error) {
-        throw error
+        throw error;
     }
-}
+};
 
 const updateRoutine = async ({ id, ...routineFields }) => {
     const setString = Object.keys(routineFields).map((key, index) =>
@@ -153,7 +153,7 @@ const updateRoutine = async ({ id, ...routineFields }) => {
     } catch (error) {
         throw error
     }
-}
+};
 
 const destroyRoutine = async (id) => {
     try {
@@ -170,9 +170,9 @@ const destroyRoutine = async (id) => {
 
         return routine;
     } catch (error) {
-        throw error
+        throw error;
     }
-}
+};
 
 module.exports = {
     getRoutineById,
