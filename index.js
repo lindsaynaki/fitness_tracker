@@ -1,24 +1,25 @@
 require('dotenv').config();
-const {PORT = 3000} = process.env;
+const { PORT = 3000 } = process.env;
 
 const express = require('express');
-const cors = require('cors');
-
 const server = express();
 
+const cors = require('cors');
 server.use(cors());
 
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 server.use(express.json());
 
-const morgan = require('morgan')
-server.use(morgan ('dev'))
+const morgan = require('morgan');
+server.use(morgan('dev'));
 
-const client = require('./db/client')
+const client = require('./db/client');
+
 const apiRouter = require('./api');
 server.use('/api', apiRouter);
 
-server.use("*", (req, res, next) =>{
+// Error Handling
+server.use("*", (req, res, next) => {
     res.status(404).send("Page not found");
 });
 
@@ -26,7 +27,7 @@ server.use((error, req, res, next) => {
     res.status(500).send(error);
 });
 
-server.listen( PORT, () => {
+server.listen(PORT, () => {
     client.connect();
-    console.log("My server is up on:", PORT);
-})
+    console.log('The server is up on port', `http://localhost:${PORT}`)
+});
