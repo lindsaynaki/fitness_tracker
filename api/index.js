@@ -1,12 +1,13 @@
-// create an api router
-// attach other routers from files in this api directory (users, activities...)
-// export the api router
+// api
 const express = require('express');
 const apiRouter = express.Router();
+const { getUserById } = require('../db');
+
+// JWT
 const jwt = require('jsonwebtoken');
-const { getUserById } = require('../db/users');
 const { JWT_SECRET } = process.env;
 
+// GET api/health
 apiRouter.get('/health', (req, res, next)=> {
     res.send ({
         message: "The server is healthy"
@@ -14,6 +15,7 @@ apiRouter.get('/health', (req, res, next)=> {
 
 });
 
+// Authorization
 apiRouter.use(async (req, res, next) => {
     const prefix = 'Bearer ';
     const auth = req.header('Authorization');
@@ -27,8 +29,8 @@ apiRouter.use(async (req, res, next) => {
             const { id } = jwt.verify(token, JWT_SECRET);
 
             if (id) {
-                req.user = await getUserById(id);
-                console.log(req.user);
+                const user = await getUserById(id);
+                req.user = user;
                 next();
             }
         } catch ({ name, message }) {
@@ -42,6 +44,7 @@ apiRouter.use(async (req, res, next) => {
     }
 });
 
+// Routers
 const usersRouter = require('./users');
 apiRouter.use('/users', usersRouter);
 

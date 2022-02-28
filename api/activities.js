@@ -4,7 +4,7 @@ const activitiesRouter = express.Router();
 const { getAllActivities, createActivity, updateActivity, getPublicRoutinesByActivity } = require('../db');
 const { requireUser } = require('./util');
 
-// GET api/activities
+// GET /activities
 activitiesRouter.get('/', async (req, res, next) => {
     try {
         const activities = await getAllActivities();
@@ -14,7 +14,7 @@ activitiesRouter.get('/', async (req, res, next) => {
     }
 });
 
-// POST /api/activities
+// POST /activities
 activitiesRouter.post('/', requireUser, async (req, res, next) => {
     const { name, description } = req.body
     try {
@@ -26,7 +26,7 @@ activitiesRouter.post('/', requireUser, async (req, res, next) => {
     }
 })
 
-// PATCH /api/activities/:activityId 
+// PATCH /activities/:activityId 
 activitiesRouter.patch('/:activityId', requireUser, async (req, res, next) => {
     const { activityId } = req.params;
     const { name, description } = req.body;
