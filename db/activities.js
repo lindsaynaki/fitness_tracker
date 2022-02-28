@@ -42,6 +42,10 @@ const createActivity = async ({ name, description }) => {
 const updateActivity = async ({ id, ...fields }) => {
     const setString = Object.keys(fields).map((key, index) => `"${key}" =  $${index + 1}`).join(', ');
 
+    if (setString.length === 0) {
+        return;
+    }
+
     try {
         const { rows: [activity] } = await client.query(`
             UPDATE activities
